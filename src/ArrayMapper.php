@@ -19,14 +19,20 @@ class ArrayMapper
     private $subMappers;
 
     /**
+     * @var array
+     */
+    private $primaryKeys;
+
+    /**
      * ArrayMapper constructor.
      * @param string $prefix
      * @param ArrayMapper[] $subMappers
      */
-    public function __construct($prefix = '', $subMappers = [])
+    public function __construct($prefix = '', $subMappers = [], $primaryKeys = [])
     {
         $this->prefix = $prefix;
         $this->subMappers = $subMappers;
+        $this->primaryKeys = $primaryKeys;
     }
 
     /**
@@ -35,6 +41,22 @@ class ArrayMapper
     private function getPrefix()
     {
         return $this->prefix;
+    }
+
+    /**
+     * @return string
+     */
+    private function getPrimaryKey()
+    {
+        if (empty($this->primaryKeys)) {
+            return $this->prefix . 'id';
+        } else {
+            $prefix = $this->prefix;
+            $keys = array_map(function ($k) use ($prefix) {
+                return $prefix . $k;
+            }, $this->primaryKeys);
+            return implode('', $keys);
+        }
     }
 
     /**
@@ -61,8 +83,10 @@ class ArrayMapper
     {
         $result = $this->getMyValues($row);
         foreach ($this->subMappers as $field=>$mapper) {
-            if (isset($row[$mapper->getPrefix() . 'id'])) {
-                $result[$field][$row[$mapper->getPrefix() . 'id']] = $mapper->getSubData($row);
+            $primaryKey = $mapper->getPrimaryKey();
+            $subData = $mapper->getSubData($row);
+            if (isset($row[$primaryKey]) && !empty($subData)) {
+                $result[$field][$row[$primaryKey]] = $subData;
             }
         }
         return $result;
@@ -96,7 +120,7 @@ class ArrayMapper
     {
         $result = [];
         foreach ($array as $row) {
-            $primaryKey = $row[$this->getPrefix() . 'id'];
+            $primaryKey = $row[$this->getPrimaryKey()];
             $item = $this->getSubData($row);
             if (isset($result[$primaryKey])) {
                 $result[$primaryKey] = $this->dataCombine($result[$primaryKey], $item);

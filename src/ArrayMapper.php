@@ -28,7 +28,7 @@ class ArrayMapper
      * @param string $prefix
      * @param ArrayMapper[] $subMappers
      */
-    public function __construct($prefix = '', $subMappers = [], $primaryKeys = [])
+    public function __construct($prefix = '', $subMappers = [], $primaryKeys = ['id'])
     {
         $this->prefix = $prefix;
         $this->subMappers = $subMappers;
@@ -44,19 +44,16 @@ class ArrayMapper
     }
 
     /**
+     * @param array $row
      * @return string
      */
-    private function getPrimaryKey()
+    private function getPrimaryKey($row)
     {
-        if (empty($this->primaryKeys)) {
-            return $this->prefix . 'id';
-        } else {
-            $prefix = $this->prefix;
-            $keys = array_map(function ($k) use ($prefix) {
-                return $prefix . $k;
-            }, $this->primaryKeys);
-            return implode('', $keys);
-        }
+        $prefix = $this->prefix;
+        $keys = array_map(function ($k) use ($prefix, $row) {
+            return $row[$prefix . $k];
+        }, $this->primaryKeys);
+        return implode('.', $keys);
     }
 
     /**
@@ -76,6 +73,20 @@ class ArrayMapper
     }
 
     /**
+     * @param $row
+     * @return bool
+     */
+    private function checkKeyExists($row)
+    {
+        foreach ($this->primaryKeys as $pk) {
+            if (!array_key_exists($this->prefix . $pk, $row)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * @param array $row
      * @return array
      */
@@ -83,10 +94,10 @@ class ArrayMapper
     {
         $result = $this->getMyValues($row);
         foreach ($this->subMappers as $field=>$mapper) {
-            $primaryKey = $mapper->getPrimaryKey();
+            $primaryKey = $mapper->getPrimaryKey($row);
             $subData = $mapper->getSubData($row);
-            if (isset($row[$primaryKey]) && !empty($subData)) {
-                $result[$field][$row[$primaryKey]] = $subData;
+            if ($mapper->checkKeyExists($row)) {
+                $result[$field][$primaryKey] = $subData;
             }
         }
         return $result;
@@ -120,7 +131,7 @@ class ArrayMapper
     {
         $result = [];
         foreach ($array as $row) {
-            $primaryKey = $row[$this->getPrimaryKey()];
+            $primaryKey = $this->getPrimaryKey($row);
             $item = $this->getSubData($row);
             if (isset($result[$primaryKey])) {
                 $result[$primaryKey] = $this->dataCombine($result[$primaryKey], $item);

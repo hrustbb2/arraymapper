@@ -36,6 +36,31 @@ class ArrayMapper
     }
 
     /**
+     * @param $config
+     * @return ArrayMapper
+     */
+    public static function build($config)
+    {
+        $prefix = '';
+        $primaryKeys = ['id'];
+        $subMappers = [];
+        foreach ($config as $key=>$value){
+            switch ($key) {
+                case 'prefix':
+                    $prefix = $value;
+                    break;
+                case 'primaryKeys':
+                    $primaryKeys = $value;
+                    break;
+                default:
+                    $subMappers[$key] = self::build($value);
+                    break;
+            }
+        }
+        return new self($prefix, $subMappers, $primaryKeys);
+    }
+
+    /**
      * @return string
      */
     private function getPrefix()

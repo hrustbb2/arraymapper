@@ -82,6 +82,20 @@ class ArrayMapper
     }
 
     /**
+     * @param $data
+     * @return array
+     */
+    private function cutKeysPrefix($data)
+    {
+        $result = [];
+        foreach ($data as $key=>$val) {
+            $newKey = substr_replace($key, '', 0, strlen($this->prefix));
+            $result[$newKey] = $val;
+        }
+        return $result;
+    }
+
+    /**
      * @param array $row
      * @return array
      */
@@ -91,10 +105,7 @@ class ArrayMapper
         $result = array_filter($row, function ($val, $key) use ($prefix) {
             return strpos($key, $prefix) === 0;
         }, ARRAY_FILTER_USE_BOTH);
-        $r = array_map(function ($val) use ($prefix) {
-            return substr_replace($val, '', 0, strlen($prefix));
-        }, array_flip($result));
-        return array_flip($r);
+        return $this->cutKeysPrefix($result);
     }
 
     /**

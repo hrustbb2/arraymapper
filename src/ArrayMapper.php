@@ -167,6 +167,9 @@ class ArrayMapper
     {
         $result = [];
         foreach ($array as $row) {
+            if(is_object($row)){
+                $row = get_object_vars($row);
+            }
             $primaryKey = $this->getPrimaryKey($row);
             $item = $this->getSubData($row);
             if (isset($result[$primaryKey])) {

@@ -61,14 +61,7 @@ class ArrayMapper
     }
 
     /**
-     * @return string
-     */
-    private function getPrefix()
-    {
-        return $this->prefix;
-    }
-
-    /**
+     * Значения примари кейс
      * @param array $row
      * @return string
      */
@@ -78,10 +71,17 @@ class ArrayMapper
         $keys = array_map(function ($k) use ($prefix, $row) {
             return $row[$prefix . $k];
         }, $this->primaryKeys);
-        return implode('.', $keys);
+        $filteredKeys = array_filter($keys, function($key){
+            return $key !== null;
+        });
+        if(empty($filteredKeys)){
+            return null;
+        }
+        return implode('.', $filteredKeys);
     }
 
     /**
+     * Отрезает префиксы
      * @param $data
      * @return array
      */
@@ -96,19 +96,21 @@ class ArrayMapper
     }
 
     /**
+     * Достает данные к текущему сету
      * @param array $row
      * @return array
      */
     private function getMyValues($row)
     {
         $prefix = $this->prefix;
-        $result = array_filter($row, function ($val, $key) use ($prefix) {
+        $result = array_filter($row, function ($key) use ($prefix) {
             return strpos($key, $prefix) === 0;
-        }, ARRAY_FILTER_USE_BOTH);
+        }, ARRAY_FILTER_USE_KEY);
         return $this->cutKeysPrefix($result);
     }
 
     /**
+     * Существует ли примари кей
      * @param $row
      * @return bool
      */
@@ -123,6 +125,7 @@ class ArrayMapper
     }
 
     /**
+     * Метод достает подмассивы данных
      * @param array $row
      * @return array
      */
@@ -132,7 +135,7 @@ class ArrayMapper
         foreach ($this->subMappers as $field=>$mapper) {
             $primaryKey = $mapper->getPrimaryKey($row);
             $subData = $mapper->getSubData($row);
-            if ($mapper->checkKeyExists($row)) {
+            if ($mapper->checkKeyExists($row) && $primaryKey !== null) {
                 $result[$field][$primaryKey] = $subData;
             }
         }
@@ -140,6 +143,7 @@ class ArrayMapper
     }
 
     /**
+     * Метод мерджит два многомерных массива
      * @param array $item
      * @param array $data
      * @return array
@@ -171,6 +175,9 @@ class ArrayMapper
                 $row = get_object_vars($row);
             }
             $primaryKey = $this->getPrimaryKey($row);
+            if($primaryKey === null){
+                continue;
+            }
             $item = $this->getSubData($row);
             if (isset($result[$primaryKey])) {
                 $result[$primaryKey] = $this->dataCombine($result[$primaryKey], $item);

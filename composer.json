@@ -1,8 +1,9 @@
 {
     "autoload": {
         "psr-4": {
-            "hrustbb2\\arraymapper\\": "src/",
-            "hrustbb2\\arraymapper\\tests\\": "tests/"
+            "hrustbb2\\arraymapper\\": "arraymapper/",
+            "hrustbb2\\base\\": "base/",
+            "hrustbb2\\tests\\": "tests/"
         }
     },
     "name": "hrustbb2/arraymapper",

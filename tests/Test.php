@@ -1,6 +1,6 @@
 <?php
 
-namespace hrustbb2\arraymapper\tests;
+namespace hrustbb2\tests;
 
 use PHPUnit\Framework\TestCase;
 use hrustbb2\arraymapper\ArrayMapper;

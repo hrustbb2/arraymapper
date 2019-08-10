@@ -16,8 +16,8 @@ abstract class Entity {
 
     /**
      * Инициировать начальные значения атрибутов
-     * @param $attributeNames Массив с именами атрибутов (ключи из массива $data), которые необходимо инициировать
-     * @param $data Данные для инициализации
+     * @param $attributeNames array Массив с именами атрибутов (ключи из массива $data), которые необходимо инициировать
+     * @param $data array Данные для инициализации
      */
     protected function initAttributes($attributeNames, $data)
     {
@@ -30,32 +30,51 @@ abstract class Entity {
 
     /**
      * Обновить атрибуты
-     * @param $attributeNames Массив с именами атрибутов (ключи из массива $data), которые необходимо обновить
+     * @param $attributeNames array Массив с именами атрибутов (ключи из массива $data), которые необходимо обновить
      * @param $data
      */
     protected function updateAttributes($attributeNames, $data)
     {
+        $scalarTypes = ['boolean', 'integer', 'double', 'string', 'NULL'];
         foreach ($attributeNames as $attribute){
+            if(!isset($this->attributes[$attribute])){
+                throw new \Exception('attribute not exist');
+            }
             if(isset($data[$attribute])){
-                $this->updatedAttributes[$attribute] = $data[$attribute];
+                if(in_array(typeof($data[$attribute]), $scalarTypes)){
+                    if($this->attributes[$attribute] != $data[$attribute]){
+                        $this->updatedAttributes[$attribute] = $data[$attribute];
+                    }
+                }else{
+                    $this->updatedAttributes[$attribute] = $data[$attribute];
+                }
             }
         }
     }
 
     /**
      * Установить атрибут
-     * @param $attributeName Имя атрибута
-     * @param $value Значение атрибута
+     * @param $attributeName string Имя атрибута
+     * @param $value mixed|null Значение атрибута
      */
     protected function setAttribute($attributeName, $value)
     {
+        $scalarTypes = ['boolean', 'integer', 'double', 'string', 'NULL'];
+        if(in_array(typeof($value), $scalarTypes)){
+            //Только в случае скалярного типа можем проверить действительно ли обновлено значение
+            if(isset($this->attributes[$attributeName]) && $this->attributes[$attributeName] != $value){
+                $this->attributes[$attributeName] = $value;
+                $this->updatedAttributes[$attributeName] = $value;
+                return;
+            }
+        }
         $this->attributes[$attributeName] = $value;
         $this->updatedAttributes[$attributeName] = $value;
     }
 
     /**
      * Получить значения атрибута
-     * @param $attributeName Имя атрибута
+     * @param $attributeName string Имя атрибута
      * @return mixed|null
      */
     protected function getAttribute($attributeName)

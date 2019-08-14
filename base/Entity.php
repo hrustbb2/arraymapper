@@ -18,20 +18,35 @@ abstract class Entity {
      * Инициировать начальные значения атрибутов
      * @param $attributeNames array Массив с именами атрибутов (ключи из массива $data), которые необходимо инициировать
      * @param $data array Данные для инициализации
+     * @throws \Exception
      */
     protected function initAttributes($attributeNames, $data)
     {
         foreach ($attributeNames as $attribute){
             if(isset($data[$attribute])){
-                $this->attributes[$attribute] = $data[$attribute];
+                $this->initAttribute($attribute, $data[$attribute]);
             }
         }
+    }
+
+    /**
+     * @param $attributeName
+     * @param $value
+     * @throws \Exception
+     */
+    protected function initAttribute($attributeName, $value)
+    {
+        if(key_exists($attributeName, $this->attributes)){
+            throw new \Exception('attribute already exist');
+        }
+        $this->attributes[$attributeName] = $value;
     }
 
     /**
      * Обновить атрибуты
      * @param $attributeNames array Массив с именами атрибутов (ключи из массива $data), которые необходимо обновить
      * @param $data
+     * @throws \Exception
      */
     protected function updateAttributes($attributeNames, $data)
     {

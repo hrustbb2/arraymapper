@@ -88,6 +88,24 @@ abstract class Entity {
     }
 
     /**
+     * Если атрибут является массивом, то добавляет значение в конец этого массива
+     * @param $attributeName
+     * @param $value
+     * @throws \Exception
+     */
+    protected function appendAttribute($attributeName, $value)
+    {
+        if(!isset($this->attributes[$attributeName])){
+            throw new \Exception('attribute not exist');
+        }
+        if(!is_array($this->attributes[$attributeName])){
+            throw new \Exception('attribute not array');
+        }
+        $this->attributes[$attributeName][] = $value;
+        $this->updatedAttributes[$attributeName] = $this->attributes[$attributeName];
+    }
+
+    /**
      * Получить значения атрибута
      * @param $attributeName string Имя атрибута
      * @return mixed|null

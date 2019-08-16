@@ -37,7 +37,7 @@ abstract class Entity {
     protected function initAttribute($attributeName, $value)
     {
         if(key_exists($attributeName, $this->attributes)){
-            throw new \Exception('attribute already exist');
+            throw new \Exception('attribute '.$attributeName.' already exist');
         }
         $this->attributes[$attributeName] = $value;
     }
@@ -52,16 +52,17 @@ abstract class Entity {
     {
         $scalarTypes = ['boolean', 'integer', 'double', 'string', 'NULL'];
         foreach ($attributeNames as $attribute){
-            if(!isset($this->attributes[$attribute])){
-                throw new \Exception('attribute not exist');
-            }
             if(isset($data[$attribute])){
-                if(in_array(typeof($data[$attribute]), $scalarTypes)){
-                    if($this->attributes[$attribute] != $data[$attribute]){
+                if(!isset($this->attributes[$attribute])){
+                    $this->setAttribute($attribute, $data[$attribute]);
+                }else{
+                    if(in_array(gettype($data[$attribute]), $scalarTypes)){
+                        if($this->attributes[$attribute] != $data[$attribute]){
+                            $this->updatedAttributes[$attribute] = $data[$attribute];
+                        }
+                    }else{
                         $this->updatedAttributes[$attribute] = $data[$attribute];
                     }
-                }else{
-                    $this->updatedAttributes[$attribute] = $data[$attribute];
                 }
             }
         }
@@ -75,11 +76,14 @@ abstract class Entity {
     protected function setAttribute($attributeName, $value)
     {
         $scalarTypes = ['boolean', 'integer', 'double', 'string', 'NULL'];
-        if(in_array(typeof($value), $scalarTypes)){
+        if(in_array(gettype($value), $scalarTypes)){
             //Только в случае скалярного типа можем проверить действительно ли обновлено значение
-            if(isset($this->attributes[$attributeName]) && $this->attributes[$attributeName] != $value){
+            if(key_exists($attributeName, $this->attributes) && $this->attributes[$attributeName] != $value){
                 $this->attributes[$attributeName] = $value;
                 $this->updatedAttributes[$attributeName] = $value;
+                return;
+            }else {
+                $this->attributes[$attributeName] = $value;
                 return;
             }
         }
@@ -95,14 +99,43 @@ abstract class Entity {
      */
     protected function appendAttribute($attributeName, $value)
     {
-        if(!isset($this->attributes[$attributeName])){
-            throw new \Exception('attribute not exist');
-        }
-        if(!is_array($this->attributes[$attributeName])){
-            throw new \Exception('attribute not array');
+        if(isset($this->attributes[$attributeName]) && !is_array($this->attributes[$attributeName])){
+            throw new \Exception('attribute '.$attributeName.' not array');
         }
         $this->attributes[$attributeName][] = $value;
-        $this->updatedAttributes[$attributeName] = $this->attributes[$attributeName];
+        $this->updatedAttributes[$attributeName][] = $value;
+    }
+
+    /**
+     * @param $attributeName
+     * @param $index
+     * @return mixed
+     * @throws \Exception
+     */
+    protected function getArrayItem($attributeName, $index)
+    {
+        if(!is_array($this->attributes[$attributeName])){
+            throw new \Exception('attribute '.$attributeName.' not array');
+        }
+        return $this->attributes[$attributeName][$index];
+    }
+
+    /**
+     * @param $attributeName
+     * @param $value
+     * @param $index
+     * @throws \Exception
+     */
+    protected function setArrayItem($attributeName, $value, $index)
+    {
+        if(!is_array($this->attributes[$attributeName])){
+            throw new \Exception('attribute '.$attributeName.' not array');
+        }
+        if(!isset($this->attributes[$attributeName][$index])){
+            throw new \Exception('index '.$index.' in attribute '.$attributeName.' not exist');
+        }
+        $this->attributes[$attributeName][$index] = $value;
+        $this->updatedAttributes[$attributeName][$index] = $value;
     }
 
     /**
@@ -113,6 +146,24 @@ abstract class Entity {
     protected function getAttribute($attributeName)
     {
         return $this->updatedAttributes[$attributeName] ?? $this->attributes[$attributeName] ?? null;
+    }
+
+    /**
+     * @param $attributeName
+     * @return mixed|null
+     */
+    protected function getCleanAttribute($attributeName)
+    {
+        return $this->attributes[$attributeName] ?? null;
+    }
+
+    /**
+     * @param $attributeName
+     * @return mixed|null
+     */
+    public function getUpdatedAttribute($attributeName)
+    {
+        return $this->updatedAttributes[$attributeName] ?? null;
     }
 
     /**

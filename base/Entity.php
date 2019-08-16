@@ -75,20 +75,28 @@ abstract class Entity {
      */
     protected function setAttribute($attributeName, $value)
     {
-        $scalarTypes = ['boolean', 'integer', 'double', 'string', 'NULL'];
-        if(in_array(gettype($value), $scalarTypes)){
-            //Только в случае скалярного типа можем проверить действительно ли обновлено значение
-            if(key_exists($attributeName, $this->attributes) && $this->attributes[$attributeName] != $value){
-                $this->attributes[$attributeName] = $value;
+        if(key_exists($attributeName, $this->attributes)){
+            if(! $this->compareAttributes($this->attributes[$attributeName], $value)){
                 $this->updatedAttributes[$attributeName] = $value;
-                return;
-            }else {
-                $this->attributes[$attributeName] = $value;
-                return;
             }
+        }else{
+            $this->attributes[$attributeName] = $value;
         }
-        $this->attributes[$attributeName] = $value;
-        $this->updatedAttributes[$attributeName] = $value;
+    }
+
+    /**
+     * Сравнивает два атрибута
+     * @param $a
+     * @param $b
+     * @return bool
+     */
+    private function compareAttributes($a, $b)
+    {
+        $scalarTypes = ['boolean', 'integer', 'double', 'string', 'NULL'];
+        if(in_array(gettype($a), $scalarTypes) && in_array(gettype($b), $scalarTypes)){
+            return $a == $b;
+        }
+        return false;
     }
 
     /**
@@ -100,7 +108,7 @@ abstract class Entity {
     protected function appendAttribute($attributeName, $value)
     {
         if(isset($this->attributes[$attributeName]) && !is_array($this->attributes[$attributeName])){
-            throw new \Exception('attribute '.$attributeName.' not array');
+            throw new \Exception('attribute '.$attributeName.' is not array');
         }
         $this->attributes[$attributeName][] = $value;
         $this->updatedAttributes[$attributeName][] = $value;
@@ -115,7 +123,7 @@ abstract class Entity {
     protected function getArrayItem($attributeName, $index)
     {
         if(!is_array($this->attributes[$attributeName])){
-            throw new \Exception('attribute '.$attributeName.' not array');
+            throw new \Exception('attribute '.$attributeName.' is not array');
         }
         return $this->attributes[$attributeName][$index];
     }
@@ -129,7 +137,7 @@ abstract class Entity {
     protected function setArrayItem($attributeName, $value, $index)
     {
         if(!is_array($this->attributes[$attributeName])){
-            throw new \Exception('attribute '.$attributeName.' not array');
+            throw new \Exception('attribute '.$attributeName.' is not array');
         }
         if(!isset($this->attributes[$attributeName][$index])){
             throw new \Exception('index '.$index.' in attribute '.$attributeName.' not exist');

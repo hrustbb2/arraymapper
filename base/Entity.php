@@ -52,8 +52,8 @@ abstract class Entity {
     {
         $scalarTypes = ['boolean', 'integer', 'double', 'string', 'NULL'];
         foreach ($attributeNames as $attribute){
-            if(isset($data[$attribute])){
-                if(!isset($this->attributes[$attribute])){
+            if(key_exists($attribute, $data)){
+                if(!key_exists($attribute, $this->attributes)){
                     $this->setAttribute($attribute, $data[$attribute]);
                 }else{
                     if(in_array(gettype($data[$attribute]), $scalarTypes)){

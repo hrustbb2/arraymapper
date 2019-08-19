@@ -23,7 +23,7 @@ abstract class Entity {
     protected function initAttributes($attributeNames, $data)
     {
         foreach ($attributeNames as $attribute){
-            if(isset($data[$attribute])){
+            if(key_exists($attribute, $data)){
                 $this->initAttribute($attribute, $data[$attribute]);
             }
         }
@@ -107,7 +107,7 @@ abstract class Entity {
      */
     protected function appendAttribute($attributeName, $value)
     {
-        if(isset($this->attributes[$attributeName]) && !is_array($this->attributes[$attributeName])){
+        if(key_exists($attributeName, $this->attributes) && !is_array($this->attributes[$attributeName])){
             throw new \Exception('attribute '.$attributeName.' is not array');
         }
         $this->attributes[$attributeName][] = $value;
@@ -139,7 +139,7 @@ abstract class Entity {
         if(!is_array($this->attributes[$attributeName])){
             throw new \Exception('attribute '.$attributeName.' is not array');
         }
-        if(!isset($this->attributes[$attributeName][$index])){
+        if(!key_exists($index, $this->attributes[$attributeName])){
             throw new \Exception('index '.$index.' in attribute '.$attributeName.' not exist');
         }
         $this->attributes[$attributeName][$index] = $value;

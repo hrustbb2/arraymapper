@@ -169,7 +169,7 @@ abstract class Entity {
      * @param $attributeName
      * @return mixed|null
      */
-    public function getUpdatedAttribute($attributeName)
+    protected function getUpdatedAttribute($attributeName)
     {
         return $this->updatedAttributes[$attributeName] ?? null;
     }

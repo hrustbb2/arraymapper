@@ -25,7 +25,9 @@
             "vendor/bin/php-cs-fixer fix ./tests --rules=@PSR2"
         ],
         "test": [
-            "php vendor/bin/phpunit tests/Test.php"
+            "php vendor/bin/phpunit tests/Test.php",
+            "php vendor/bin/phpunit tests/TestCollection.php",
+            "php vendor/bin/phpunit tests/TestEntity.php"
         ]
     },
     "require": {

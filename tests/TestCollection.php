@@ -23,4 +23,12 @@ class TestCollection extends TestCase {
         $this->assertEquals($users['one']->getName(), 'n1');
     }
 
+    public function testCount()
+    {
+        /** @var UserEntity[] $users */
+        $users = new UsersCollection();
+        $count = count($users);
+        $this->assertEquals($count, 3);
+    }
+
 }

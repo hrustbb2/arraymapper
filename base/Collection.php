@@ -2,7 +2,7 @@
 
 namespace hrustbb2\base;
 
-abstract class Collection implements Iterator {
+abstract class Collection implements \Iterator, \ArrayAccess, \Countable {
 
     private $cursor = 0;
 
@@ -49,13 +49,19 @@ abstract class Collection implements Iterator {
         return $this->isExists($key);
     }
 
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         //Not impossible
     }
 
-    public function offsetGet($key) {
-
+    public function offsetGet($key)
+    {
         return ($this->isExists($key)) ? $this->build($key) : null;
+    }
+
+    public function count()
+    {
+        return count($this->getKeys());
     }
 
 }

@@ -10,9 +10,10 @@ class TestCollection extends TestCase {
     {
         /** @var UserEntity[] $users */
         $users = new UsersCollection();
-        $counter = 1;
+        $counter = 0;
         foreach ($users as $key=>$user){
             $this->assertEquals($user->getEmail(), 'm@n'.$counter);
+            ++$counter;
         }
     }
 
@@ -20,7 +21,7 @@ class TestCollection extends TestCase {
     {
         /** @var UserEntity[] $users */
         $users = new UsersCollection();
-        $this->assertEquals($users['one']->getName(), 'n1');
+        $this->assertEquals($users['one']->getName(), 'n0');
     }
 
     public function testCount()

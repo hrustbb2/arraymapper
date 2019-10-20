@@ -15,8 +15,8 @@ class UsersCollection extends Collection {
     {
         $keys = ['one', 'two', 'three'];
         foreach ($keys as $i=>$key){
-            $this->data[$keys] = new UserEntity();
-            $this->data[$keys]->load([
+            $this->data[$key] = new UserEntity();
+            $this->data[$key]->load([
                 'id' => $i,
                 'name' => 'n' . $i,
                 'email' => 'm@n' . $i,

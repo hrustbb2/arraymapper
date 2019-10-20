@@ -35,8 +35,11 @@ abstract class Collection implements \Iterator, \ArrayAccess, \Countable {
 
     public function valid()
     {
-        $key = $this->getKeys()[$this->cursor];
-        return $this->isExists($key);
+        if(array_key_exists($this->cursor, $this->getKeys())){
+            $key = $this->getKeys()[$this->cursor];
+            return $this->isExists($key);
+        }
+        return false;
     }
 
     public function offsetSet($offset, $value)

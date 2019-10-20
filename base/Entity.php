@@ -72,10 +72,11 @@ abstract class Entity {
      * Установить атрибут
      * @param $attributeName string Имя атрибута
      * @param $value mixed|null Значение атрибута
+     * @param $asUpdated boolean Установить как обновленный
      */
-    protected function setAttribute($attributeName, $value)
+    protected function setAttribute($attributeName, $value, $asUpdated = false)
     {
-        if(key_exists($attributeName, $this->attributes)){
+        if(key_exists($attributeName, $this->attributes) || $asUpdated){
             if(! $this->compareAttributes($this->attributes[$attributeName], $value)){
                 $this->updatedAttributes[$attributeName] = $value;
             }

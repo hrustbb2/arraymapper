@@ -54,7 +54,7 @@ abstract class Entity {
         foreach ($attributeNames as $attribute){
             if(key_exists($attribute, $data)){
                 if(!key_exists($attribute, $this->attributes)){
-                    $this->setAttribute($attribute, $data[$attribute]);
+                    $this->setAttribute($attribute, $data[$attribute], true);
                 }else{
                     if(in_array(gettype($data[$attribute]), $scalarTypes)){
                         if($this->attributes[$attribute] != $data[$attribute]){
@@ -76,12 +76,15 @@ abstract class Entity {
      */
     protected function setAttribute($attributeName, $value, $asUpdated = false)
     {
-        if(key_exists($attributeName, $this->attributes) || $asUpdated){
+        if(key_exists($attributeName, $this->attributes)){
             if(! $this->compareAttributes($this->attributes[$attributeName], $value)){
                 $this->updatedAttributes[$attributeName] = $value;
             }
         }else{
             $this->attributes[$attributeName] = $value;
+            if($asUpdated){
+                $this->updatedAttributes[$attributeName] = $value;
+            }
         }
     }
 

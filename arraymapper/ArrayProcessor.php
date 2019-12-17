@@ -15,7 +15,8 @@ class ArrayProcessor {
                 $prefix = $field['prefix'];
                 $currentPath[$prefix] = $key;
                 $this->pathMap->{$prefix} = $currentPath;
-                buildPathMap($field, $this->pathMap, $currentPath);
+                $this->buildPathMap($field, $currentPath);
+                $currentPath = [];
             }
         }
     }
@@ -24,12 +25,12 @@ class ArrayProcessor {
     {
         $this->pathMap = new \stdClass();
         $this->pathMap->{$conf['prefix']} = [];
-        $this->buildPathMap($conf, $this->pathMap);
+        $this->buildPathMap($conf);
         $prefix = $conf['prefix'];
         $this->result = new \stdClass();
 
         foreach ($array as $line){
-            $rowId = $line[$prefix . 'id'];
+            $rowId = ((array) $line)[$prefix . 'id'];
             if(!isset($result->{$rowId})){
                 $this->result->{$rowId} = new \stdClass();
             }
@@ -54,10 +55,10 @@ class ArrayProcessor {
                 $c = $currentRow;
                 foreach ($path as $p=>$step){
                     if(!isset($c->{$step})){
-                        $c->{$step} = new stdClass();
+                        $c->{$step} = new \stdClass();
                     }
                     if(!isset($c->{$step}->{$currentIds[$p]})){
-                        $c->{$step}->{$currentIds[$p]} = new stdClass();
+                        $c->{$step}->{$currentIds[$p]} = new \stdClass();
                     }
                     $c = $c->{$step}->{$currentIds[$p]};
                 }
@@ -75,7 +76,8 @@ class ArrayProcessor {
 
     public function resultArray()
     {
-        return json_encode(json_decode($this->result));
+        $str = json_encode($this->result);
+        return json_decode($str);
     }
 
 }

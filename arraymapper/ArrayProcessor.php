@@ -31,21 +31,11 @@ class ArrayProcessor {
 
         foreach ($array as $line){
             $rowId = ((array) $line)[$prefix . 'id'];
-            if(!isset($result->{$rowId})){
+            if(!isset($this->result->{$rowId})){
                 $this->result->{$rowId} = new \stdClass();
             }
             $currentRow = $this->result->{$rowId};
-            $currentIds = [];
-            $data = [];
-            foreach ($line as $field=>$val){
-                $fieldSegments = explode('_', $field);
-                $fieldPrefix = array_shift($fieldSegments);
-                $fieldName = join('_', $fieldSegments);
-                if($fieldName == 'id'){
-                    $currentIds[$fieldPrefix . '_'] = $val;
-                }
-                $data[$fieldPrefix][$fieldName] = $val;
-            }
+
             foreach ($line as $field=>$val){
                 $fieldSegments = explode('_', $field);
                 $fieldPrefix = array_shift($fieldSegments);
@@ -53,16 +43,19 @@ class ArrayProcessor {
 
                 $path = $this->pathMap->{$fieldPrefix . '_'};
                 $c = $currentRow;
+
                 foreach ($path as $p=>$step){
+                    $id = $line[$p . 'id'];
                     if(!isset($c->{$step})){
                         $c->{$step} = new \stdClass();
                     }
-                    if(!isset($c->{$step}->{$currentIds[$p]})){
-                        $c->{$step}->{$currentIds[$p]} = new \stdClass();
+                    if(!isset($c->{$step}->{$id})){
+                        $c->{$step}->{$id} = new \stdClass();
                     }
-                    $c = $c->{$step}->{$currentIds[$p]};
+                    $c = $c->{$step}->{$id};
                 }
-                $c->{$fieldName} = $data[$fieldPrefix][$fieldName];
+
+                $c->{$fieldName} = $val;
             }
         }
 
@@ -77,7 +70,7 @@ class ArrayProcessor {
     public function resultArray()
     {
         $str = json_encode($this->result);
-        return json_decode($str);
+        return json_decode($str, true);
     }
 
 }

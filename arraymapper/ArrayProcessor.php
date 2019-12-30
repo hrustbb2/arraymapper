@@ -55,7 +55,9 @@ class ArrayProcessor {
                     $c = $c->{$step}->{$id};
                 }
 
-                $c->{$fieldName} = $val;
+                if($val['id'] !== null){
+                    $c->{$fieldName} = $val;
+                }
             }
         }
 

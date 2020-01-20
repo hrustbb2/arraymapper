@@ -36,7 +36,7 @@ class ArrayProcessor {
             }
             $currentRow = $this->result->{$rowId};
 
-            foreach ($line as $field=>$val){
+            foreach ($line as $field=>$val) {
                 $fieldSegments = explode('_', $field);
                 $fieldPrefix = array_shift($fieldSegments);
                 $fieldName = join('_', $fieldSegments);
@@ -44,18 +44,18 @@ class ArrayProcessor {
                 $path = $this->pathMap->{$fieldPrefix . '_'};
                 $c = $currentRow;
 
-                foreach ($path as $p=>$step){
-                    $id = $line[$p . 'id'];
-                    if(!isset($c->{$step})){
+                foreach ($path as $p => $step) {
+                    $id = $line->{$p . 'id'};
+                    if (!isset($c->{$step})) {
                         $c->{$step} = new \stdClass();
                     }
-                    if(!isset($c->{$step}->{$id})){
+                    if (!isset($c->{$step}->{$id})) {
                         $c->{$step}->{$id} = new \stdClass();
                     }
                     $c = $c->{$step}->{$id};
                 }
 
-                if($val['id'] !== null){
+                if ($line->{$fieldPrefix . '_id'} !== null) {
                     $c->{$fieldName} = $val;
                 }
             }
